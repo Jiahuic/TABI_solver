@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   FILE *fp;
   char c[16];
   /* variables local to main */
-  int i,j,k;
+  int i,j,k,ierr;
   double s[3],pot=0.0,sum=0.0,pot_temp=0.0;
   double ptl,soleng,t1,t2;
   char fname[16],density[16];
@@ -21,6 +21,9 @@ int main(int argc, char *argv[])
   extern double potential_molecule(double s[3]);
   extern int comp_source();
   extern int output_potential();
+  /* timer */
+  extern void timer_start();
+  extern void timer_end();
   /* variables used to compute potential solution */
   double units_para;
   double *chrptl;
@@ -46,14 +49,14 @@ int main(int argc, char *argv[])
   printf("%d %s %s \n",argc,argv[0],argv[1]);
 
   fp=fopen("usrdata.in","r");
-    fscanf(fp,"%s %s",c,&fname);
-    fscanf(fp,"%s %s",c,&density);
-    fscanf(fp,"%s %lf",c,&epsp);
-    fscanf(fp,"%s %lf",c,&epsw);
-    fscanf(fp,"%s %lf",c,&bulk_strength);
-    fscanf(fp,"%s %d",c,&order);
-    fscanf(fp,"%s %d",c,&maxparnode);
-    fscanf(fp,"%s %lf",c,&theta);
+    ierr=fscanf(fp,"%s %s",c,fname);
+    ierr=fscanf(fp,"%s %s",c,density);
+    ierr=fscanf(fp,"%s %lf",c,&epsp);
+    ierr=fscanf(fp,"%s %lf",c,&epsw);
+    ierr=fscanf(fp,"%s %lf",c,&bulk_strength);
+    ierr=fscanf(fp,"%s %d",c,&order);
+    ierr=fscanf(fp,"%s %d",c,&maxparnode);
+    ierr=fscanf(fp,"%s %lf",c,&theta);
 
   fclose(fp);
 
