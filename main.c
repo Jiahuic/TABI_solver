@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
   }
   free(face);
 
-  for(i=0;i<3;i++) {
+  for(i=0;i<2;i++) {
     free(extr_f[i]);
   }
   free(extr_f);
