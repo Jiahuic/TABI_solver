@@ -284,6 +284,12 @@ int readin(char fname[16], char density[16])
   }
   printf("total area = %.17f\n",sum);
 
+  sprintf(fname_tp,"rm %s%s.xyzr",fpath,fname);
+  system(fname_tp);
+  sprintf(fname_tp,"rm %s%s.vert",fpath,fname);
+  system(fname_tp);
+  sprintf(fname_tp,"rm %s%s.face",fpath,fname);
+  system(fname_tp);
   return 0;
 
 }

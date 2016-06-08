@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
   ldw=N;
   ldh=RESTRT+1;
   iter=100;
-  resid=1.0;
+  resid=1.0e-4;
   xvct=(double *) calloc(N,sizeof(double));
 
   work=(double *) calloc(ldw*(RESTRT+4),sizeof(double));
@@ -263,84 +263,91 @@ int output_potential(){
                    in at most 11 triangles, 15 is safe */
   para_temp=units_coef*4*pi;
 
-  xtemp=(double*)calloc(2*numpars,sizeof(double));
-  ind_vert=(int**)calloc(nspt,sizeof(int*));
-  for (i=0;i<nspt;i++){
-    ind_vert[i]=(int*)calloc(nface_vert,sizeof(int));
+  xtemp=(double*)calloc(2*nface,sizeof(double));
+  ind_vert=(int**)calloc(nface_vert,sizeof(int*));
+  for (i=0;i<nface_vert;i++){
+    ind_vert[i]=(int*)calloc(nspt,sizeof(int));
   }
   vert_ptl=(double*)calloc(nspt*2,sizeof(double));
-  xyz_temp=(double*)calloc(3*numpars,sizeof(double));
+  xyz_temp=(double*)calloc(3*nface,sizeof(double));
 
   /* put things back */
-  for (i=0;i<numpars;i++){
+  for (i=0;i<nface;i++){
     xtemp[orderarr[i]]=xvct[i];
-    xtemp[orderarr[i]+numpars]=xvct[i+numpars];
+    xtemp[orderarr[i]+nface]=xvct[i+nface];
     xyz_temp[orderarr[i]*3]=tr_xyz[i*3];
     xyz_temp[orderarr[i]*3+1]=tr_xyz[i*3+1];
     xyz_temp[orderarr[i]*3+2]=tr_xyz[i*3+2];
   }
-  for (i=0;i<numpars;i++){
+
+  for (i=0;i<nface;i++){
     xvct[i]=xtemp[i];
-    xvct[i+numpars]=xtemp[i+numpars];
+    xvct[i+nface]=xtemp[i+nface];
     tr_xyz[i*3]=xyz_temp[i*3];
     tr_xyz[i*3+1]=xyz_temp[i*3+1];
     tr_xyz[i*3+2]=xyz_temp[i*3+2];
   }
 
-  for (i=0;i<numpars;i++){
+   for (i=0;i<nface;i++){
     for (j=0;j<3;j++){
       for (k=0;k<nface_vert-1;k++){
-        if (ind_vert[face[j][i]-1][k] == 0.0){
-          ind_vert[face[j][i]-1][k] = i;
-          ind_vert[face[j][i]-1][nface_vert-1] += 1;
+        if (ind_vert[k][face[j][i]-1] == 0.0){
+          ind_vert[k][face[j][i]-1] = i+1;
+          ind_vert[nface_vert-1][face[j][i]-1] += 1;
           break;
         }
       }
     }
   }
 
-  for (i=0;i<10;i++){
-    printf("%d %d %d\n",face[0][i],ind_vert[i][0],ind_vert[i][14]);
-  }
-
   for (i=0;i<nspt;i++){
     tot_length=0.0;
-    for (j=0;j<ind_vert[i][nface_vert-1];j++){
+    for (j=0;j<ind_vert[nface_vert-1][i];j++){
       /* distance between vertices and centroid */
-      aa[0]=tr_xyz[3*i]-vert[0][i];
-      aa[1]=tr_xyz[3*i+1]-vert[1][i];
-      aa[2]=tr_xyz[3*i+2]-vert[2][i];
+      aa[0]=tr_xyz[3*(ind_vert[j][i]-1)]-vert[0][i];
+      aa[1]=tr_xyz[3*(ind_vert[j][i]-1)+1]-vert[1][i];
+      aa[2]=tr_xyz[3*(ind_vert[j][i]-1)+2]-vert[2][i];
       dot_aa=aa[0]*aa[0]+aa[1]*aa[1]+aa[2]*aa[2];
       loc_length=sqrt(dot_aa);
 
-      vert_ptl[i]+=1.0/loc_length*xvct[ind_vert[i][j]];
-      vert_ptl[i+nspt]+=1.0/loc_length*xvct[ind_vert[i][j]+numpars];
+      vert_ptl[i]+=1.0/loc_length*xvct[ind_vert[j][i]-1];
+      vert_ptl[i+nspt]+=1.0/loc_length*xvct[ind_vert[j][i]+nface-1];
       tot_length+=1.0/loc_length;
     }
     vert_ptl[i]=vert_ptl[i]/tot_length;
     vert_ptl[i+nspt]=vert_ptl[i+nspt]/tot_length;
   }
 
-  for (i=0;i<2*numpars;i++)
+  for (i=0;i<2*nface;i++)
     xvct[i]=xvct[i]*para_temp;
   for (i=0;i<nspt;i++){
     vert_ptl[i]=vert_ptl[i]*para_temp;
     vert_ptl[i+nspt]=vert_ptl[i+nspt]*para_temp;
   }
 
-  for (i=0;i<10;i++)
-    printf("%d %f %f\n",i,vert_ptl[i],vert_ptl[i+nspt]);
-
   printf("The max and min potential and normal derivatives on elements are:\n");
-  printf("potential %f %f\n",maxval(xvct,numpars),minval(xvct,numpars));
-  printf("norm derv %f %f\n",maxval(xvct+numpars,numpars),minval(xvct+numpars,numpars));
+  printf("potential %f %f\n",maxval(xvct,nface),minval(xvct,nface));
+  printf("norm derv %f %f\n",maxval(xvct+nface,nface),minval(xvct+nface,nface));
 
   printf("The max and min potential and normal derivatives on vertices are:\n");
   printf("potential %f %f\n",maxval(vert_ptl,nspt),minval(vert_ptl,nspt));
-  printf("norm derv %f %f\n",maxval(vert_ptl+numpars,nspt),minval(vert_ptl+numpars,nspt));
+  printf("norm derv %f %f\n",maxval(vert_ptl+nspt,nspt),minval(vert_ptl+nspt,nspt));
+
+  FILE *fp=fopen("surface_potential.dat","w");
+  fprintf(fp,"%d %d\n",nspt,nface);
+
+  for(i=0;i<nspt;i++)
+    fprintf(fp,"%d %f %f %f %f %f %f %f %f\n",i,vert[0][i],vert[1][i],
+            vert[2][i],snrm[0][i],snrm[1][i],snrm[2][i],vert_ptl[i],
+            vert_ptl[i+nspt]);
+
+  for(i=0;i<nface;i++)
+    fprintf(fp,"%d %d %d\n",face[0][i],face[1][i],face[2][i]);
+
+  fclose(fp);
 
   free(xtemp);
-  for (i=0;i<nspt;i++){
+  for (i=0;i<nface_vert;i++){
     free(ind_vert[i]);
   }
   free(ind_vert);
