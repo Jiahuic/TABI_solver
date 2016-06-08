@@ -45,7 +45,7 @@ int readin(char fname[16], char density[16])
 
   /*read in vertices*/
 
-  sprintf(fpath," ");
+  sprintf(fpath,"");
 
   sprintf(fname_tp,"%s%s.pqr",fpath,fname);
   fp=fopen(fname_tp,"r");
