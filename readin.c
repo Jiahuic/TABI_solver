@@ -72,7 +72,7 @@ int readin(char fname[16], char density[16])
   /* open the file and read through the first two rows*/
   fp=fopen(fname_tp,"r");
   for (i=1;i<=2;i++){
-    while (c=getc(fp)!='\n'){
+    while ((c=getc(fp)!='\n')){
     }
   }
   ierr=fscanf(fp,"%d %d %lf %lf ",&nspt,&natm,&den,&prob_rds);
@@ -113,7 +113,7 @@ int readin(char fname[16], char density[16])
   sprintf(fname_tp, "%s%s.face",fpath,fname);
   fp=fopen(fname_tp,"r");
   for (i=1;i<=2;i++){
-    while (c=getc(fp)!='\n'){
+    while ((c=getc(fp)!='\n')){
     }
   }
   ierr=fscanf(fp,"%d %d %lf %lf ",&nface,&natm,&den,&prob_rds);
