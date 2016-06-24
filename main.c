@@ -1,10 +1,26 @@
+/* 
+ * C routine for tabipb solver
+ * 
+ * Geng, W and Krasny, R, A treecode-accelerated boundary integral
+ * Poisson-Boltzmann solver for electrostatics of solvated biomolecules
+ *
+ * Author: Jiahui Chen, Southern Methodist University, Dallas, TX
+ * 
+ * Based on TABI fortran version written by:
+ * Weihua Geng, Southern Methodist University, Dallas, TX
+ * Robery Krasny, University of Michigan, Ann Arbor, MI
+ *
+ * */
+
 #include <time.h>
 #include <stdio.h>
 #include <math.h>
-#include "gl_variables.h"
 #include <stdlib.h>
 #include <string.h>
-#include "treecode.h"  /* try to use less variables */
+
+#include "gl_variables.h"
+#include "treecode.h"
+#include "array.h"
 
 int main(int argc, char *argv[])
 {
@@ -110,35 +126,12 @@ int main(int argc, char *argv[])
   timer_end();
 
   /* free memory */
-  for(i=0;i<3;i++) {
-    free(extr_v[i]);
-  }
-  free(extr_v);
-
-  for(i=0;i<3;i++) {
-    free(vert[i]);
-  }
-  free(vert);
-
-  for(i=0;i<3;i++) {
-    free(snrm[i]);
-  }
-  free(snrm);
-
-  for(i=0;i<3;i++) {
-    free(face[i]);
-  }
-  free(face);
-
-  for(i=0;i<2;i++) {
-    free(extr_f[i]);
-  }
-  free(extr_f);
-
-  for(i=0;i<3;i++) {
-    free(atmpos[i]);
-  }
-  free(atmpos);
+  free_matrix(extr_v);
+  free_matrix(vert);
+  free_matrix(snrm);
+  free_matrix(face);
+  free_matrix(extr_f);
+  free_matrix(atmpos);
 
   free(tr_xyz);
   free(tr_q);

@@ -3,7 +3,9 @@
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+
 #include "gl_variables.h"
+#include "array.h"
 
 /* function computing the area of a triangle given vertices coodinates */
 double triangle_area(double v[3][3])
@@ -41,8 +43,6 @@ int readin(char fname[16], char density[16])
   double cos_theta,G0,tp1,G1,r_s[3];
   double xx[3],yy[3];
 
-  extern double **Make2DIntArray(), **Make2DDoubleArray();
-
   /*read in vertices*/
 
   sprintf(fpath,"");
@@ -79,9 +79,11 @@ int readin(char fname[16], char density[16])
   printf("nspt=%d, natm=%d, den=%lf, prob=%lf\n", nspt,natm,den,prob_rds);
 
   /*allocate variables for vertices file*/
-  extr_v=Make2DIntArray(3,nspt,"extr_v");
-  vert=Make2DDoubleArray(3,nspt,"vert");
-  snrm=Make2DDoubleArray(3,nspt,"snrm");
+
+  make_matrix(extr_v,3,nspt);
+  make_matrix(vert,3,nspt);
+  make_matrix(snrm,3,nspt);
+
 
   for (i=0;i<=nspt-1;i++){
     ierr=fscanf(fp,"%lf %lf %lf %lf %lf %lf %d %d %d",&a1,&a2,&a3,&b1,&b2,&b3,&i1,&i2,&i3);
@@ -118,9 +120,9 @@ int readin(char fname[16], char density[16])
   }
   ierr=fscanf(fp,"%d %d %lf %lf ",&nface,&natm,&den,&prob_rds);
   printf("nface=%d, natm=%d, den=%lf, prob=%lf\n", nface,natm,den,prob_rds);
-  extr_f=Make2DIntArray(2,nface,"extr_f");
-  face=Make2DIntArray(3,nface,"face");
 
+  make_matrix(extr_f,2,nface);
+  make_matrix(face,3,nface);
 
   for (i=0;i<=nface-1;i++){
     ierr=fscanf(fp,"%d %d %d %d %d",&j1,&j2,&j3,&i1,&i2);
@@ -142,7 +144,8 @@ int readin(char fname[16], char density[16])
   if ((atmrad=(double *) malloc(natm*sizeof(double)))==NULL) {
     printf("error in allcating atmrad");
   }
-  atmpos=Make2DDoubleArray(3,natm,"atmpos");
+
+  make_matrix(atmpos,3,natm);
 
   for (i=0;i<=natm-1;i++){
     ierr=fscanf(fp,"%lf %lf %lf %lf ",&a1,&a2,&a3,&b1);
@@ -180,7 +183,8 @@ int readin(char fname[16], char density[16])
 
   /* delele triangles with extreme small areas and closed to each other */
   nfacenew=nface;
-  face_copy=Make2DIntArray(3,nface,"face_copy");
+
+  make_matrix(face_copy,3,nface);
   for (i=0;i<3; i++) memcpy(face_copy[i],face[i],nface*sizeof(int));
 
   for (i=0;i<nface;i++){
@@ -234,15 +238,15 @@ int readin(char fname[16], char density[16])
   printf("%d faces are deleted\n",nface-nfacenew);
   nface=nfacenew;
 
-  for(i = 0; i < 3; i++) free(face[i]);
-  free(face);
+  free_matrix(face);
 
-  face=Make2DIntArray(3,nface,"face msms");
+  make_matrix(face,3,nface);
+
   for (i=0; i<nface; i++){
     for (j=0; j<3; j++) face[j][i]=face_copy[j][i];
   }
-  for(i = 0; i<3; i++) free(face_copy[i]);
-  free(face_copy);
+
+  free_matrix(face_copy);
 
 /* tr_xyz: The position of the particles on surface */
 /* tr_q:	  The normail direction at the particle location*/
