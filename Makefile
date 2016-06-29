@@ -2,7 +2,7 @@
 #comp = nvcc
 comp = gcc
 flag = -c -O3  
-bimpb.exe: main.o readin.o d_sign.o daxpy.o dcopy.o ddot.o dgemv.o dnrm2.o drot.o drotg.o dscal.o dtrsv.o gmres.o gl_functions.o treecode.o pp_timer.o
+bimpb.exe: main.o readin.o d_sign.o daxpy.o dcopy.o ddot.o dgemv.o dnrm2.o drot.o drotg.o dscal.o dtrsv.o gmres.o gl_functions.o treecode.o pp_timer.o xmalloc.o
 	$(comp) -o bimpb.exe *.o -lm
 pp_timer.o: pp_timer.c
 	$(comp) $(flag) pp_timer.c
@@ -34,6 +34,8 @@ gmres.o: gmres.c
 	$(comp) $(flag) gmres.c
 gl_functions.o: gl_functions.c
 	$(comp) $(flag) gl_functions.c
+xmalloc.o: xmalloc.c
+	$(comp) $(flag) xmalloc.c
 treecode.o: treecode.c
 	$(comp) $(flag) treecode.c
 matvec.o: matvec.c
