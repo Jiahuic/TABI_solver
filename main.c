@@ -147,6 +147,7 @@ int main(int argc, char *argv[])
   free(bvct);
   free(xvct);
   free(atmchr);
+  free(atmrad);
   free(chrpos);
   free(chrptl);
 
